@@ -2,254 +2,310 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Binary Love — Surprise</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Binary Love — Gallery</title>
   <style>
-    :root{--bg:#0b1020;--card:#0f1724;--accent:#8b5cf6;--muted:#94a3b8}
+    :root{
+      --bg:#fff6fb;           /* nền trắng hồng rất nhẹ */
+      --ink:#3a2a3f;          /* chữ tím than */
+      --muted:#7b6b86;        /* chữ phụ */
+      --card:#ffffff;         /* thẻ trắng */
+      --border:#f3e3f7;       /* viền hồng nhạt */
+      --grad1:#ffe0ef;        /* gradient hồng */
+      --grad2:#e8e0ff;        /* gradient tím */
+      --grad3:#fff6d6;        /* gradient vàng nhạt */
+      --accent:#ff5ea7;       /* hồng tươi */
+      --accent2:#8b5cf6;      /* tím */
+    }
+    *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;color:#e6eef8;background:linear-gradient(180deg,var(--bg),#081026);display:flex;align-items:center;justify-content:center;padding:20px}
-    .wrap{width:100%;max-width:980px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(2,6,23,0.7);}
-    header{display:flex;gap:12px;align-items:center}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;color:var(--ink);background:linear-gradient(120deg,var(--grad1),var(--grad2) 50%,var(--grad3));background-attachment:fixed}
+
+    /* Layout */
+    .page{min-height:100%;display:flex;flex-direction:column}
+    header{padding:16px 18px;display:flex;align-items:center;gap:12px}
     header h1{font-size:20px;margin:0}
-    p.lead{color:var(--muted);margin:6px 0 14px}
-    .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
-    .controls > *{background:var(--card);border-radius:10px;padding:10px}
-    label{display:flex;flex-direction:column;font-size:13px}
-    input[type=file]{background:transparent}
-    input[type=range]{width:180px}
-    button{background:linear-gradient(90deg,var(--accent),#06b6d4);border:none;padding:10px 12px;border-radius:10px;color:#061026;font-weight:600;cursor:pointer}
-    .canvas-wrap{display:flex;gap:12px;align-items:flex-start}
-    canvas{background:#000;border-radius:8px;max-width:100%;height:auto}
-    .sidebar{min-width:220px;max-width:260px}
-    textarea{width:100%;min-height:80px;border-radius:8px;padding:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-    .small{font-size:13px;color:var(--muted)}
-    footer{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:12px}
-    .download-link{color:#9be7ff;text-decoration:underline;cursor:pointer}
-    .credit{color:var(--muted);font-size:13px}
-    @media (max-width:880px){.canvas-wrap{flex-direction:column}.sidebar{max-width:none;width:100%}}
+    header .sub{color:var(--muted);font-size:13px}
+
+    .wrap{flex:1;display:flex;justify-content:center;padding:10px}
+    .frame{width:min(1100px,96vw);display:grid;grid-template-columns:1fr;gap:14px}
+    @media (min-width:980px){.frame{grid-template-columns:1fr 320px}}
+
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.8));border:1px solid var(--border);border-radius:18px;box-shadow:0 15px 30px rgba(151,120,180,0.18);overflow:hidden}
+    .card-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:linear-gradient(90deg,#fff,rgba(255,255,255,0.5));border-bottom:1px solid var(--border)}
+    .card-title{font-weight:700}
+    .hint{font-size:12px;color:var(--muted)}
+
+    .canvas-wrap{position:relative}
+    canvas#art{display:block;width:100%;height:auto;background:#ffffff}
+
+    .controls{position:absolute;right:10px;bottom:10px;display:flex;gap:8px;z-index:5}
+    .btn{appearance:none;border:none;cursor:pointer;border-radius:999px;padding:9px 12px;font-weight:600;background:#fff;color:#5a476e;border:1px solid var(--border);box-shadow:0 6px 20px rgba(148,113,180,0.18)}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:white;border:none}
+
+    /* Filmstrip */
+    .strip{display:flex;gap:10px;overflow:auto;padding:10px;background:linear-gradient(180deg,#fff,rgba(255,255,255,0.85));border-top:1px solid var(--border)}
+    .thumb{flex:0 0 auto;width:88px;height:120px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#fff;position:relative;cursor:pointer}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .thumb.active{outline:3px solid rgba(255,94,167,0.6)}
+
+    /* Sidebar */
+    .side{background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.8));border:1px solid var(--border);border-radius:18px;padding:12px 14px}
+    .side h3{margin:6px 0 8px;font-size:15px}
+    .side p,.side li{color:var(--muted);font-size:13px}
+    .side code{background:#fff0fa;padding:2px 6px;border-radius:6px;border:1px solid var(--border)}
+
+    /* Hearts FX */
+    canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:2}
+
+    footer{display:flex;justify-content:center;padding:12px 0 18px;color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <canvas id="fx"></canvas>
+
+  <div class="page">
     <header>
-      <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#1e293b,#071130);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#9be7ff">01</div>
+      <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#ffd0e6,#e5d8ff);display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d3d7a">01</div>
       <div>
-        <h1>Binary Love — trang bất ngờ</h1>
-        <p class="lead">Tải ảnh của người ấy lên — trang sẽ biến ảnh thành nghệ thuật số dùng chữ 0 và 1. Tùy chỉnh mật độ, font và thông điệp để tạo bất ngờ.</p>
+        <h1>Binary Love — Gallery</h1>
+        <div class="sub">Đặt ảnh vào thư mục <code>anh/</code> → Trang tự chạy kiểu cuộn phim; click/chạm để tung 💖.</div>
       </div>
     </header>
 
-    <div class="controls">
-      <label>
-        1) Chọn ảnh (jpg/png)
-        <input id="imgFile" type="file" accept="image/*">
-      </label>
-      <label>
-        2) Kích thước ô (độ lớn chữ): <span id="sizeVal">8</span> px
-        <input id="cellSize" type="range" min="4" max="24" value="8">
-      </label>
-      <label>
-        3) Ngưỡng (sáng/tối, 0-1): <span id="thVal">0.5</span>
-        <input id="threshold" type="range" min="0" max="1" step="0.01" value="0.5">
-      </label>
-      <label>
-        4) Phong cách chữ
-        <select id="mode">
-          <option value="binary">0 và 1</option>
-          <option value="zeros">Chỉ 0 (mảnh tối)</option>
-          <option value="ones">Chỉ 1 (mảnh sáng)</option>
-          <option value="random">Ngẫu nhiên 0/1</option>
-        </select>
-      </label>
-      <label>
-        5) Tin nhắn bí mật (hiện khi rê chuột hoặc bấm)
-        <textarea id="message" placeholder="Viết lời chúc bất ngờ...">Anh yêu em — mã nhị phân của anh dành cho em 💜</textarea>
-      </label>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button id="renderBtn">Tạo ảnh</button>
-        <button id="downloadBtn">Tải PNG</button>
-        <button id="resetBtn" style="background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.04)">Xóa</button>
-      </div>
-    </div>
+    <main class="wrap">
+      <div class="frame">
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">Khung chính</div>
+            <div class="hint">Ảnh trong repo → chuyển thành 0/1 theo thời gian thực.</div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="art" width="1400" height="900" aria-label="Binary portrait"></canvas>
+            <div class="controls">
+              <button class="btn" id="prev">◀︎</button>
+              <button class="btn" id="rerender">Vẽ lại</button>
+              <a class="btn primary" id="download" href="#">Tải PNG</a>
+              <button class="btn" id="next">▶︎</button>
+            </div>
+          </div>
+          <div id="strip" class="strip" aria-label="Filmstrip thumbnails"></div>
+        </section>
 
-    <div class="canvas-wrap">
-      <canvas id="outCanvas" width="800" height="600"></canvas>
-      <div class="sidebar">
-        <div class="small">Xem trước, rồi dùng nút Tải PNG để lưu ảnh. Bạn có thể mở file .html này trên điện thoại hoặc upload lên GitHub Pages / Netlify để chia sẻ link.</div>
-        <hr style="opacity:0.06;margin:10px 0">
-        <div class="small"><strong>Gợi ý bất ngờ:</strong>
+        <aside class="side">
+          <h3>Cách thêm ảnh (không sửa code)</h3>
+          <ol>
+            <li>Tạo thư mục <code>anh/</code> (cùng cấp với <code>index.html</code>).</li>
+            <li>Thêm ảnh tự do: <code>.jpg .jpeg .png .webp</code>.</li>
+            <li>Tạo file <code>anh/images.json</code> chứa danh sách tên ảnh, ví dụ:
+<pre>["01.jpg","02.jpg","ky-niem.png"]</pre>
+            </li>
+            <li>Commit → reload trang. Nếu không có <code>images.json</code>, trang sẽ thử các tên theo mẫu: <code>img-1.jpg .. img-20.jpg</code>.</li>
+          </ol>
+          <h3>Mẹo hiển thị</h3>
           <ul>
-            <li>Đặt ảnh nền là tấm ảnh mà bạn chụp chung — cô ấy sẽ nhận ra ngay.</li>
-            <li>Viết tin nhắn cá nhân trong ô &quot;Tin nhắn bí mật&quot;.</li>
-            <li>Upload file lên Netlify/GitHub Pages để có link chia sẻ dạng: <code>https://yourname.github.io/binary-love-page.html</code></li>
+            <li>Ảnh tỉ lệ dọc 3:4 hoặc vuông; độ tương phản tốt.</li>
+            <li>Kéo filmstrip để chọn ảnh; tự động chạy (có thể tắt trong cấu hình).</li>
           </ul>
-        </div>
-        <hr style="opacity:0.06;margin:10px 0">
-        <div class="credit">Tác giả: bạn (tải, chỉnh và host). Nếu muốn, tôi sẽ giúp bạn tinh chỉnh màu, font, hoặc tạo phiên bản tự động chèn ảnh từ URL.</div>
+        </aside>
       </div>
-    </div>
+    </main>
 
-    <footer>
-      <div class="small">Lưu ý: xử lý ảnh thực hiện ngay trên máy (không upload ra server).</div>
-      <div><span class="credit">Sẵn sàng tạo bất ngờ?</span></div>
-    </footer>
+    <footer>Theme hồng–tím–vàng nhạt, hiệu ứng tim 💖. Chạy 100% trong trình duyệt.</footer>
   </div>
 
 <script>
-  // Utility: load image from file input
-  const fileInput = document.getElementById('imgFile');
-  const canvas = document.getElementById('outCanvas');
-  const ctx = canvas.getContext('2d');
-  const cellSizeEl = document.getElementById('cellSize');
-  const sizeVal = document.getElementById('sizeVal');
-  const thresholdEl = document.getElementById('threshold');
-  const thVal = document.getElementById('thVal');
-  const renderBtn = document.getElementById('renderBtn');
-  const downloadBtn = document.getElementById('downloadBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const modeSel = document.getElementById('mode');
-  const msgEl = document.getElementById('message');
+// ========================
+// CONFIG — chỉnh ở đây nếu muốn
+// ========================
+const CONFIG = {
+  MANIFEST: 'anh/images.json', // nếu tồn tại, dùng danh sách trong file này
+  FALLBACK_PREFIX: 'anh/img-', // nếu không có manifest → thử img-1.jpg..img-20.jpg
+  FALLBACK_EXT: '.jpg',
+  FALLBACK_COUNT: 20,
+  AUTOPLAY: true,
+  AUTOPLAY_MS: 3500,
+  CELL: 9,
+  THRESHOLD: 0.5,
+  MODE: 'binary', // 'binary' | 'zeros' | 'ones' | 'random'
+  PADDING: 18
+};
 
-  let loadedImage = null;
+// Elements
+const art = document.getElementById('art');
+const ctx = art.getContext('2d');
+const fx = document.getElementById('fx');
+const fxc = fx.getContext('2d');
+const strip = document.getElementById('strip');
+const btnPrev = document.getElementById('prev');
+const btnNext = document.getElementById('next');
+const btnRender = document.getElementById('rerender');
+const btnDownload = document.getElementById('download');
 
-  sizeVal.textContent = cellSizeEl.value;
-  thVal.textContent = thresholdEl.value;
+let images = [];      // list of URLs
+let thumbs = [];      // <img> elements
+let current = 0;      // index
+let loaded = {};      // url -> Image
+let autoplayTimer = null;
 
-  cellSizeEl.addEventListener('input',()=>sizeVal.textContent = cellSizeEl.value);
-  thresholdEl.addEventListener('input',()=>thVal.textContent = thresholdEl.value);
+// Responsive canvases
+function fitCanvases(){
+  const ratio = window.devicePixelRatio || 1;
+  const maxW = Math.min(1400, Math.floor(window.innerWidth*0.96));
+  const maxH = Math.min(900, Math.floor(window.innerHeight*0.60));
+  art.style.width = maxW+'px';
+  art.style.height = maxH+'px';
+  art.width = Math.floor(maxW*ratio);
+  art.height = Math.floor(maxH*ratio);
 
-  fileInput.addEventListener('change',e=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    const reader = new FileReader();
-    reader.onload = ev=>{
-      const img = new Image();
-      img.onload = ()=>{ loadedImage = img; autoFitCanvas(img); renderBinary(); };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(f);
+  fx.width = Math.floor(window.innerWidth*ratio);
+  fx.height = Math.floor(window.innerHeight*ratio);
+  fx.style.width = window.innerWidth+'px';
+  fx.style.height = window.innerHeight+'px';
+}
+window.addEventListener('resize', ()=>{fitCanvases(); if(images.length) renderBinary(images[current]);});
+
+// Manifest loader
+async function fetchManifest(){
+  try{
+    const res = await fetch(CONFIG.MANIFEST + '?v=' + Date.now());
+    if(!res.ok) throw 0;
+    const list = await res.json();
+    return list.map(n=> 'anh/' + n);
+  }catch(e){
+    // fallback numbered
+    const tryUrls = [];
+    for(let i=1;i<=CONFIG.FALLBACK_COUNT;i++){
+      tryUrls.push(CONFIG.FALLBACK_PREFIX + i + CONFIG.FALLBACK_EXT);
+    }
+    // probe existence in parallel (HEAD not allowed on pages, so GET with no-cors fallback)
+    const checks = await Promise.all(tryUrls.map(u=>probe(u)));
+    return tryUrls.filter((_,i)=>checks[i]);
+  }
+}
+
+async function probe(url){
+  try{ const r = await fetch(url+'?v='+Date.now(), {method:'GET'}); return r.ok; }catch{ return false; }
+}
+
+function preload(url){
+  return new Promise((resolve,reject)=>{
+    if(loaded[url]) return resolve(loaded[url]);
+    const img = new Image();
+    img.onload = ()=>{loaded[url]=img; resolve(img)};
+    img.onerror = reject;
+    img.src = url + (url.includes('?')?'&':'?') + 'v=' + Date.now();
   });
+}
 
-  function autoFitCanvas(img){
-    const maxW = 900; const maxH = 700;
-    let w = img.width; let h = img.height;
-    const ratio = Math.min(maxW/w, maxH/h, 1);
-    canvas.width = Math.round(w*ratio);
-    canvas.height = Math.round(h*ratio);
-  }
-
-  function renderBinary(){
-    if(!loadedImage){ // draw placeholder
-      ctx.fillStyle = '#081026'; ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = '#9aa8bf'; ctx.font = '20px monospace'; ctx.fillText('Chưa có ảnh — chọn ảnh để bắt đầu',20,40);
-      return;
-    }
-    const cell = parseInt(cellSizeEl.value,10);
-    // draw image to temp canvas to read pixels
-    const tmp = document.createElement('canvas');
-    tmp.width = canvas.width; tmp.height = canvas.height;
-    const tctx = tmp.getContext('2d');
-    tctx.drawImage(loadedImage,0,0,canvas.width,canvas.height);
-    const imgData = tctx.getImageData(0,0,canvas.width,canvas.height).data;
-
-    // prepare output
-    ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
-    ctx.font = cell + 'px monospace';
-
-    const mode = modeSel.value;
-    for(let y=0;y<canvas.height;y+=cell){
-      for(let x=0;x<canvas.width;x+=cell){
-        const idx = ((y*canvas.width)+x)*4;
-        const r = imgData[idx], g = imgData[idx+1], b = imgData[idx+2];
-        // luminance
-        const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
-        let char = (lum > thresholdEl.value) ? '1' : '0';
-        if(mode === 'zeros') char = '0';
-        if(mode === 'ones') char = '1';
-        if(mode === 'random') char = Math.random() > 0.5 ? '1':'0';
-        // optionally invert for better contrast
-        ctx.fillStyle = lum > thresholdEl.value ? '#f8fafc' : '#05203a';
-        // draw at center of cell
-        ctx.fillText(char, x + cell/2, y + cell/2);
-      }
-    }
-
-    // overlay invisible message area (revealed on hover)
-    // We'll draw nothing visually here, but attach mouse events to show message
-  }
-
-  renderBtn.addEventListener('click', ()=>{ renderBinary(); showToast('Đã tạo! Rê chuột lên ảnh để xem/ẩn tin nhắn.'); });
-
-  // Simple toast
-  function showToast(text){
-    const t = document.createElement('div');
-    t.textContent = text;
-    Object.assign(t.style,{position:'fixed',right:'20px',bottom:'20px',padding:'10px 14px',background:'rgba(10,20,40,0.9)',color:'#cfefff',borderRadius:'10px',boxShadow:'0 6px 20px rgba(2,6,23,0.7)'});
-    document.body.appendChild(t);
-    setTimeout(()=>{t.style.transition='opacity 300ms';t.style.opacity='0';setTimeout(()=>t.remove(),300)},1800);
-  }
-
-  // Download canvas as PNG
-  downloadBtn.addEventListener('click', ()=>{
-    const url = canvas.toDataURL('image/png');
-    const a = document.createElement('a');
-    a.href = url; a.download = 'binary-love.png';
-    document.body.appendChild(a); a.click(); a.remove();
+function buildStrip(urls){
+  strip.innerHTML=''; thumbs=[];
+  urls.forEach((u,idx)=>{
+    const d=document.createElement('div'); d.className='thumb';
+    const im=document.createElement('img'); im.loading='lazy'; im.src=u; d.appendChild(im);
+    d.addEventListener('click',()=>{go(idx)});
+    strip.appendChild(d); thumbs.push(d);
   });
+}
 
-  resetBtn.addEventListener('click', ()=>{ loadedImage=null; fileInput.value=''; ctx.clearRect(0,0,canvas.width,canvas.height); renderBinary(); });
+function activate(i){
+  thumbs.forEach((t,idx)=>t.classList.toggle('active', idx===i));
+  // ensure visible
+  const el = thumbs[i]; if(!el) return;
+  const rect = el.getBoundingClientRect(); const srect = strip.getBoundingClientRect();
+  if(rect.left < srect.left || rect.right > srect.right){ el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); }
+}
 
-  // show secret message overlay when mouse hovers canvas (desktop)
-  canvas.addEventListener('mouseenter', (e)=>{ showSecret(true); });
-  canvas.addEventListener('mouseleave', (e)=>{ showSecret(false); });
-  canvas.addEventListener('click', (e)=>{ // toggle on mobile
-    const existed = canvas.getAttribute('data-secret') === '1';
-    showSecret(!existed);
-  });
+function go(i){
+  current = (i+images.length)%images.length;
+  renderBinary(images[current]);
+  activate(current);
+  if(CONFIG.AUTOPLAY) restartAutoplay();
+}
 
-  function showSecret(on){
-    const msg = msgEl.value.trim();
-    if(!msg) return;
-    if(on){
-      // draw semi-transparent overlay and message
-      ctx.fillStyle = 'rgba(2,6,23,0.55)';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      // multiline
-      ctx.fillStyle = '#e6f7ff';
-      const lines = wrapText(ctx, msg, canvas.width-40, 24);
-      ctx.font = '20px sans-serif';
-      let startY = canvas.height/2 - (lines.length*20)/2;
-      for(let i=0;i<lines.length;i++){
-        ctx.fillText(lines[i], canvas.width/2, startY + i*24);
-      }
-      canvas.setAttribute('data-secret','1');
-    } else {
-      canvas.removeAttribute('data-secret');
-      // redraw binary image
-      renderBinary();
+function next(){ go(current+1); }
+function prev(){ go(current-1); }
+
+btnNext.addEventListener('click', next);
+btnPrev.addEventListener('click', prev);
+btnRender.addEventListener('click', ()=>renderBinary(images[current]));
+
+// Binary render
+async function renderBinary(url){
+  if(!url){ placeholder(); return; }
+  const ratio = window.devicePixelRatio || 1;
+  const cell = Math.max(4, Math.floor(CONFIG.CELL * ratio));
+  const pad = Math.floor(CONFIG.PADDING * ratio);
+  const img = await preload(url);
+
+  const W = art.width, H = art.height;
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,W,H);
+
+  // Fit image into inner box
+  const availW = W - pad*2, availH = H - pad*2;
+  const imgR = img.width / img.height; const boxR = availW / availH;
+  let dw, dh; if(imgR>boxR){dw=availW; dh=Math.floor(availW/imgR);} else {dh=availH; dw=Math.floor(availH*imgR);} 
+  const dx = Math.floor((W-dw)/2), dy = Math.floor((H-dh)/2);
+
+  // sample pixels
+  const tmp = document.createElement('canvas'); tmp.width=dw; tmp.height=dh; const tctx = tmp.getContext('2d');
+  tctx.drawImage(img,0,0,dw,dh);
+  const data = tctx.getImageData(0,0,dw,dh).data;
+
+  ctx.textBaseline='middle'; ctx.textAlign='center'; ctx.font = cell+'px monospace';
+  for(let y=0;y<dh;y+=cell){
+    for(let x=0;x<dw;x+=cell){
+      const idx = ((y*dw)+x)*4; const r=data[idx], g=data[idx+1], b=data[idx+2];
+      const lum = (0.299*r + 0.587*g + 0.114*b)/255; // 0..1
+      const char = pickChar(lum, CONFIG.THRESHOLD, CONFIG.MODE);
+      ctx.fillStyle = lum > CONFIG.THRESHOLD ? '#6a5a80' : '#d8c6ff';
+      ctx.fillText(char, dx + x + cell/2, dy + y + cell/2);
     }
   }
+  // frame
+  ctx.strokeStyle = 'rgba(170,130,210,0.35)';
+  ctx.lineWidth = Math.max(1, ratio);
+  ctx.strokeRect(dx-1,dy-1,dw+2,dh+2);
+}
 
-  function wrapText(ctx, text, maxWidth, lineHeight){
-    const words = text.split(' ');
-    const lines = [];
-    let cur = '';
-    ctx.font = '20px sans-serif';
-    for(let w of words){
-      const test = cur ? (cur + ' ' + w) : w;
-      if(ctx.measureText(test).width > maxWidth){
-        if(cur) lines.push(cur);
-        cur = w;
-      } else cur = test;
-    }
-    if(cur) lines.push(cur);
-    return lines;
-  }
+function pickChar(lum, th, mode){
+  if(mode==='zeros') return '0';
+  if(mode==='ones') return '1';
+  if(mode==='random') return Math.random()>0.5?'1':'0';
+  return lum>th ? '1':'0';
+}
 
-  // initial placeholder
-  canvas.width = 800; canvas.height = 500; renderBinary();
+function placeholder(){
+  const W=art.width,H=art.height; const ratio=window.devicePixelRatio||1; const size=Math.max(16,Math.floor(18*ratio));
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#8a769f'; ctx.font = size+'px system-ui, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Đang tải ảnh… (hãy thêm vào thư mục anh/)', W/2, H/2);
+}
+
+// Download current canvas
+btnDownload.addEventListener('click', (e)=>{
+  e.preventDefault();
+  const url = art.toDataURL('image/png'); const a = document.createElement('a'); a.href=url; a.download='binary-love.png'; document.body.appendChild(a); a.click(); a.remove();
+});
+
+// Hearts FX — click/hold to spawn
+const hearts = [];
+function spawnHearts(x,y,count=16){
+  const ratio = window.devicePixelRatio||1;
+  for(let i=0;i<count;i++) hearts.push({x:x*ratio,y:y*ratio,vx:(Math.random()*2-1)*2*ratio,vy:(Math.random()*-2-0.5)*ratio,life:1,rot:Math.random()*Math.PI,size:(Math.random()*10+10)*ratio});
+}
+function heartPath(ctx,s){ctx.moveTo(0,-s*0.35);ctx.bezierCurveTo(s*0.5,-s*1.2, s*1.6,-s*0.1, 0, s*0.9);ctx.bezierCurveTo(-s*1.6,-s*0.1, -s*0.5,-s*1.2, 0,-s*0.35);} 
+function tick(){fxc.clearRect(0,0,fx.width,fx.height); const ratio=window.devicePixelRatio||1; for(let i=hearts.length-1;i>=0;i--){const h=hearts[i]; h.vy+=0.035*ratio; h.x+=h.vx; h.y+=h.vy; h.life-=0.012; if(h.life<=0){hearts.splice(i,1); continue;} fxc.save(); fxc.translate(h.x,h.y); fxc.rotate(h.rot); fxc.globalAlpha=Math.max(0,h.life); const g=fxc.createLinearGradient(-h.size,-h.size,h.size,h.size); g.addColorStop(0,'#ff8fbe'); g.addColorStop(1,'#7c5eff'); fxc.fillStyle=g; fxc.beginPath(); heartPath(fxc,h.size); fxc.closePath(); fxc.fill(); fxc.restore(); } requestAnimationFrame(tick);} 
+function pointerXY(ev){ if(ev.touches&&ev.touches[0]) return {x:ev.touches[0].clientX,y:ev.touches[0].clientY}; return {x:ev.clientX,y:ev.clientY}; }
+['click','pointerdown','touchstart'].forEach(evt=>window.addEventListener(evt,(e)=>{const {x,y}=pointerXY(e); spawnHearts(x,y,18);},{passive:true}));
+let holdTimer=null; ['pointerdown','touchstart'].forEach(evt=>window.addEventListener(evt,(e)=>{const {x,y}=pointerXY(e); holdTimer=setInterval(()=>spawnHearts(x,y,8),120);},{passive:true})); ['pointerup','touchend','pointercancel'].forEach(evt=>window.addEventListener(evt,()=>{clearInterval(holdTimer); holdTimer=null;}));
+
+function restartAutoplay(){ if(autoplayTimer) clearInterval(autoplayTimer); if(!CONFIG.AUTOPLAY) return; autoplayTimer=setInterval(next, CONFIG.AUTOPLAY_MS); }
+
+// Init
+fitCanvases(); placeholder();
+fetchManifest().then(list=>{images=list; buildStrip(images); if(!images.length){placeholder(); return;} current=0; go(0); restartAutoplay();}).catch(()=>placeholder());
+requestAnimationFrame(tick);
 </script>
 </body>
 </html>
