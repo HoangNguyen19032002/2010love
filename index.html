@@ -3,62 +3,93 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>Binary Love — Gallery</title>
+  <title>Love Unlock — Quiz Surprise</title>
   <style>
     :root{
-      --bg:#fff6fb;           /* nền trắng hồng rất nhẹ */
-      --ink:#3a2a3f;          /* chữ tím than */
-      --muted:#7b6b86;        /* chữ phụ */
-      --card:#ffffff;         /* thẻ trắng */
-      --border:#f3e3f7;       /* viền hồng nhạt */
-      --grad1:#ffe0ef;        /* gradient hồng */
-      --grad2:#e8e0ff;        /* gradient tím */
-      --grad3:#fff6d6;        /* gradient vàng nhạt */
-      --accent:#ff5ea7;       /* hồng tươi */
-      --accent2:#8b5cf6;      /* tím */
+      /* Dark-but-sweet palette */
+      --bg1:#0d1020;            /* nền tối dịu */
+      --bg2:#131834;            /* xanh tím than */
+      --milk:#ffebf5;           /* hồng trà sữa rất nhạt */
+      --pink:#ff6fa8;           /* hồng tươi */
+      --purple:#8b5cf6;         /* tím */
+      --lav:#c7b6ff;            /* tím nhạt */
+      --gold:#ffe79a;           /* vàng nhạt */
+      --ink:#fdf7ff;            /* chữ sáng */
+      --muted:#b9b7d2;          /* chữ phụ */
+      --card:#151a36;           /* nền thẻ */
+      --border:rgba(255,255,255,0.08);
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;color:var(--ink);background:linear-gradient(120deg,var(--grad1),var(--grad2) 50%,var(--grad3));background-attachment:fixed}
+    body{
+      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
+      color:var(--ink);
+      background: radial-gradient(1200px 700px at 10% -10%, #1a1f42 0%, #0d1020 45%, #0a0f22 100%),
+                  linear-gradient(120deg, rgba(255,111,168,0.10), rgba(139,92,246,0.10) 50%, rgba(255,231,154,0.08));
+      background-attachment: fixed;
+      overflow-x:hidden;
+    }
 
-    /* Layout */
-    .page{min-height:100%;display:flex;flex-direction:column}
-    header{padding:16px 18px;display:flex;align-items:center;gap:12px}
-    header h1{font-size:20px;margin:0}
+    /* FX canvas for hearts */
+    #fx{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+    /* Shell */
+    .page{min-height:100%;display:flex;flex-direction:column;position:relative;z-index:1}
+    header{padding:16px 18px;display:flex;gap:12px;align-items:center}
+    header .logo{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-weight:900;
+      color:#2b1035;background:conic-gradient(from 0deg, #ffe0ef, #e8e0ff, #fff6d6, #ffe0ef); box-shadow:0 6px 18px rgba(255,111,168,.25)}
+    header h1{margin:0;font-size:20px;letter-spacing:.3px;text-shadow:0 1px 0 #fff3, 0 8px 24px rgba(139,92,246,.35)}
     header .sub{color:var(--muted);font-size:13px}
 
-    .wrap{flex:1;display:flex;justify-content:center;padding:10px}
-    .frame{width:min(1100px,96vw);display:grid;grid-template-columns:1fr;gap:14px}
-    @media (min-width:980px){.frame{grid-template-columns:1fr 320px}}
+    .wrap{flex:1;display:flex;justify-content:center;padding:14px}
+    .frame{width:min(960px,96vw);display:grid;grid-template-columns:1fr;gap:14px}
 
-    .card{background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.8));border:1px solid var(--border);border-radius:18px;box-shadow:0 15px 30px rgba(151,120,180,0.18);overflow:hidden}
-    .card-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:linear-gradient(90deg,#fff,rgba(255,255,255,0.5));border-bottom:1px solid var(--border)}
-    .card-title{font-weight:700}
-    .hint{font-size:12px;color:var(--muted)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      border:1px solid var(--border); border-radius:18px; overflow:hidden; box-shadow:0 20px 40px rgba(8,5,30,.5)}
+    .card-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0)); border-bottom:1px solid var(--border)}
 
-    .canvas-wrap{position:relative}
-    canvas#art{display:block;width:100%;height:auto;background:#ffffff}
+    .shine{
+      background: linear-gradient(90deg, #fff 0%, #ffd1e6 20%, #e2d7ff 50%, #fff6cc 80%, #fff 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-shadow: 0 2px 0 rgba(255,255,255,0.35), 0 12px 30px rgba(255,111,168,0.30);
+    }
 
-    .controls{position:absolute;right:10px;bottom:10px;display:flex;gap:8px;z-index:5}
-    .btn{appearance:none;border:none;cursor:pointer;border-radius:999px;padding:9px 12px;font-weight:600;background:#fff;color:#5a476e;border:1px solid var(--border);box-shadow:0 6px 20px rgba(148,113,180,0.18)}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:white;border:none}
+    .card-body{padding:16px 14px}
 
-    /* Filmstrip */
-    .strip{display:flex;gap:10px;overflow:auto;padding:10px;background:linear-gradient(180deg,#fff,rgba(255,255,255,0.85));border-top:1px solid var(--border)}
-    .thumb{flex:0 0 auto;width:88px;height:120px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#fff;position:relative;cursor:pointer}
-    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-    .thumb.active{outline:3px solid rgba(255,94,167,0.6)}
+    /* Quiz box */
+    .quiz{display:grid;gap:14px}
+    .q{font-size:16px;color:var(--milk)}
+    .input{display:flex;gap:10px;flex-wrap:wrap}
+    input[type=text]{flex:1;min-width:220px;background:#0f1430;color:var(--ink);border:1px solid var(--border);
+      padding:12px 14px;border-radius:12px;outline:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.03);
+      font-weight:600;letter-spacing:.2px}
+    button{appearance:none;border:none;border-radius:999px;padding:11px 14px;font-weight:800;cursor:pointer}
+    .btn-primary{background:linear-gradient(90deg, var(--pink), var(--purple)); color:#0b0620; box-shadow:0 10px 22px rgba(139,92,246,.35)}
+    .btn-ghost{background:transparent;color:var(--lav);border:1px solid var(--border)}
 
-    /* Sidebar */
-    .side{background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.8));border:1px solid var(--border);border-radius:18px;padding:12px 14px}
-    .side h3{margin:6px 0 8px;font-size:15px}
-    .side p,.side li{color:var(--muted);font-size:13px}
-    .side code{background:#fff0fa;padding:2px 6px;border-radius:6px;border:1px solid var(--border)}
+    .msg{min-height:22px;font-size:13px;color:var(--muted)}
+    .msg.error{color:#ff9ac0; text-shadow:0 0 18px rgba(255,111,168,.35)}
 
-    /* Hearts FX */
-    canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:2}
+    /* Unlock panel */
+    .unlocked{display:none;padding:8px 2px}
+    .unlocked.show{display:block;animation:fadeIn .5s ease}
+    .card-congrats{display:grid;gap:12px;place-items:center;text-align:center;padding:6px 6px 14px}
+    .congrats-title{font-size:22px;font-weight:900; letter-spacing:.3px}
+    .congrats-title .shine{font-size:26px}
+    .wish{max-width:720px;line-height:1.6;color:#f9eaff;font-weight:600;text-shadow:0 1px 0 #fff3, 0 10px 24px rgba(255,111,168,.25)}
 
-    footer{display:flex;justify-content:center;padding:12px 0 18px;color:var(--muted);font-size:13px}
+    /* Subtle 3D label */
+    .label3d{
+      display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.35px;
+      color:#2b1035;background:linear-gradient(90deg,#ffe0ef,#fff6d6); box-shadow:0 8px 18px rgba(255,231,154,.25)
+    }
+
+    @keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+    footer{display:flex;justify-content:center;padding:12px 0 18px;color:var(--muted);font-size:12px}
   </style>
 </head>
 <body>
@@ -66,246 +97,175 @@
 
   <div class="page">
     <header>
-      <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#ffd0e6,#e5d8ff);display:flex;align-items:center;justify-content:center;font-weight:800;color:#6d3d7a">01</div>
+      <div class="logo">❤</div>
       <div>
-        <h1>Binary Love — Gallery</h1>
-        <div class="sub">Đặt ảnh vào thư mục <code>anh/</code> → Trang tự chạy kiểu cuộn phim; click/chạm để tung 💖.</div>
+        <h1 class="shine">Love Unlock — Trang bất ngờ</h1>
+        <div class="sub">Trả lời đúng câu hỏi để mở khoá lời chúc. Nhấn/ chạm để bung trái tim 💖</div>
       </div>
     </header>
 
-    <main class="wrap">
+    <div class="wrap">
       <div class="frame">
         <section class="card">
-          <div class="card-header">
-            <div class="card-title">Khung chính</div>
-            <div class="hint">Ảnh trong repo → chuyển thành 0/1 theo thời gian thực.</div>
+          <div class="card-head">
+            <span class="label3d">QUIZ LOCK</span>
+            <span class="sub">Tùy chỉnh câu hỏi/đáp án trong phần CONFIG</span>
           </div>
-          <div class="canvas-wrap">
-            <canvas id="art" width="1400" height="900" aria-label="Binary portrait"></canvas>
-            <div class="controls">
-              <button class="btn" id="prev">◀︎</button>
-              <button class="btn" id="rerender">Vẽ lại</button>
-              <a class="btn primary" id="download" href="#">Tải PNG</a>
-              <button class="btn" id="next">▶︎</button>
+          <div class="card-body">
+            <!-- QUIZ -->
+            <div class="quiz" id="quizBox">
+              <div class="q" id="question">Câu hỏi sẽ đặt ở đây…</div>
+              <div class="input">
+                <input id="answer" type="text" placeholder="Nhập câu trả lời…" autocomplete="one-time-code"/>
+                <button id="btnCheck" class="btn-primary">Mở khoá</button>
+                <button id="btnHint" class="btn-ghost">Gợi ý</button>
+              </div>
+              <div class="msg" id="msg"></div>
+            </div>
+
+            <!-- UNLOCKED PANEL -->
+            <div class="unlocked" id="unlocked">
+              <div class="card-congrats">
+                <div class="congrats-title"><span class="shine">🎉 Đã mở khoá!</span></div>
+                <div class="wish" id="wishText"></div>
+              </div>
             </div>
           </div>
-          <div id="strip" class="strip" aria-label="Filmstrip thumbnails"></div>
         </section>
-
-        <aside class="side">
-          <h3>Cách thêm ảnh (không sửa code)</h3>
-          <ol>
-            <li>Tạo thư mục <code>anh/</code> (cùng cấp với <code>index.html</code>).</li>
-            <li>Thêm ảnh tự do: <code>.jpg .jpeg .png .webp</code>.</li>
-            <li>Tạo file <code>anh/images.json</code> chứa danh sách tên ảnh, ví dụ:
-<pre>["01.jpg","02.jpg","ky-niem.png"]</pre>
-            </li>
-            <li>Commit → reload trang. Nếu không có <code>images.json</code>, trang sẽ thử các tên theo mẫu: <code>img-1.jpg .. img-20.jpg</code>.</li>
-          </ol>
-          <h3>Mẹo hiển thị</h3>
-          <ul>
-            <li>Ảnh tỉ lệ dọc 3:4 hoặc vuông; độ tương phản tốt.</li>
-            <li>Kéo filmstrip để chọn ảnh; tự động chạy (có thể tắt trong cấu hình).</li>
-          </ul>
-        </aside>
       </div>
-    </main>
+    </div>
 
-    <footer>Theme hồng–tím–vàng nhạt, hiệu ứng tim 💖. Chạy 100% trong trình duyệt.</footer>
+    <footer>Chạy hoàn toàn trên trình duyệt — không upload dữ liệu.</footer>
   </div>
 
 <script>
 // ========================
-// CONFIG — chỉnh ở đây nếu muốn
+// CONFIG — bạn sửa tại đây cho tiện
 // ========================
 const CONFIG = {
-  MANIFEST: 'anh/images.json', // nếu tồn tại, dùng danh sách trong file này
-  FALLBACK_PREFIX: 'anh/img-', // nếu không có manifest → thử img-1.jpg..img-20.jpg
-  FALLBACK_EXT: '.jpg',
-  FALLBACK_COUNT: 20,
-  AUTOPLAY: true,
-  AUTOPLAY_MS: 3500,
-  CELL: 9,
-  THRESHOLD: 0.5,
-  MODE: 'binary', // 'binary' | 'zeros' | 'ones' | 'random'
-  PADDING: 18
+  QUESTION: 'Ngày đầu tiên chúng ta nhắn tin là ngày nào? (dd/mm/yyyy)',
+  ANSWERS: [ '20/10/2024', '20-10-2024' ], // nhiều đáp án hợp lệ
+  HINT: 'Gợi ý: Ngày Phụ nữ VN 😉',
+  CASE_INSENSITIVE: true,
+  IGNORE_ACCENTS: true,
+  TRIM: true,
+  WISH: `Em yêu, cảm ơn vì đã đến bên đời anh.\n\nMỗi ngày bên em đều là một điều kỳ diệu nhỏ. \nChúc em luôn rực rỡ như nắng sớm, ngọt ngào như trà sữa, và bình yên trong vòng tay anh. 💖`,
 };
 
 // Elements
-const art = document.getElementById('art');
-const ctx = art.getContext('2d');
+const qEl = document.getElementById('question');
+const ansEl = document.getElementById('answer');
+const msgEl = document.getElementById('msg');
+const btnCheck = document.getElementById('btnCheck');
+const btnHint = document.getElementById('btnHint');
+const unlocked = document.getElementById('unlocked');
+const wishText = document.getElementById('wishText');
+
+// Hearts FX canvas
 const fx = document.getElementById('fx');
 const fxc = fx.getContext('2d');
-const strip = document.getElementById('strip');
-const btnPrev = document.getElementById('prev');
-const btnNext = document.getElementById('next');
-const btnRender = document.getElementById('rerender');
-const btnDownload = document.getElementById('download');
+function fitFX(){ const r=window.devicePixelRatio||1; fx.width=innerWidth*r; fx.height=innerHeight*r; fx.style.width=innerWidth+'px'; fx.style.height=innerHeight+'px'; }
+window.addEventListener('resize', fitFX);
+fitFX();
 
-let images = [];      // list of URLs
-let thumbs = [];      // <img> elements
-let current = 0;      // index
-let loaded = {};      // url -> Image
-let autoplayTimer = null;
-
-// Responsive canvases
-function fitCanvases(){
-  const ratio = window.devicePixelRatio || 1;
-  const maxW = Math.min(1400, Math.floor(window.innerWidth*0.96));
-  const maxH = Math.min(900, Math.floor(window.innerHeight*0.60));
-  art.style.width = maxW+'px';
-  art.style.height = maxH+'px';
-  art.width = Math.floor(maxW*ratio);
-  art.height = Math.floor(maxH*ratio);
-
-  fx.width = Math.floor(window.innerWidth*ratio);
-  fx.height = Math.floor(window.innerHeight*ratio);
-  fx.style.width = window.innerWidth+'px';
-  fx.style.height = window.innerHeight+'px';
-}
-window.addEventListener('resize', ()=>{fitCanvases(); if(images.length) renderBinary(images[current]);});
-
-// Manifest loader
-async function fetchManifest(){
-  try{
-    const res = await fetch(CONFIG.MANIFEST + '?v=' + Date.now());
-    if(!res.ok) throw 0;
-    const list = await res.json();
-    return list.map(n=> 'anh/' + n);
-  }catch(e){
-    // fallback numbered
-    const tryUrls = [];
-    for(let i=1;i<=CONFIG.FALLBACK_COUNT;i++){
-      tryUrls.push(CONFIG.FALLBACK_PREFIX + i + CONFIG.FALLBACK_EXT);
-    }
-    // probe existence in parallel (HEAD not allowed on pages, so GET with no-cors fallback)
-    const checks = await Promise.all(tryUrls.map(u=>probe(u)));
-    return tryUrls.filter((_,i)=>checks[i]);
+// Hearts store
+const hearts=[];
+function spawnHearts(x,y,count=24, burst=true){
+  const r=window.devicePixelRatio||1;
+  for(let i=0;i<count;i++){
+    const a = burst ? (Math.random()*Math.PI*2) : (Math.random()*Math.PI - Math.PI/2);
+    const sp = 2 + Math.random()*3;
+    hearts.push({x:x*r, y:y*r, vx:Math.cos(a)*sp*r, vy:Math.sin(a)*sp*r - (burst?0:2*r), life:1, rot:Math.random()*Math.PI, size:(12+Math.random()*16)*r});
   }
-}
-
-async function probe(url){
-  try{ const r = await fetch(url+'?v='+Date.now(), {method:'GET'}); return r.ok; }catch{ return false; }
-}
-
-function preload(url){
-  return new Promise((resolve,reject)=>{
-    if(loaded[url]) return resolve(loaded[url]);
-    const img = new Image();
-    img.onload = ()=>{loaded[url]=img; resolve(img)};
-    img.onerror = reject;
-    img.src = url + (url.includes('?')?'&':'?') + 'v=' + Date.now();
-  });
-}
-
-function buildStrip(urls){
-  strip.innerHTML=''; thumbs=[];
-  urls.forEach((u,idx)=>{
-    const d=document.createElement('div'); d.className='thumb';
-    const im=document.createElement('img'); im.loading='lazy'; im.src=u; d.appendChild(im);
-    d.addEventListener('click',()=>{go(idx)});
-    strip.appendChild(d); thumbs.push(d);
-  });
-}
-
-function activate(i){
-  thumbs.forEach((t,idx)=>t.classList.toggle('active', idx===i));
-  // ensure visible
-  const el = thumbs[i]; if(!el) return;
-  const rect = el.getBoundingClientRect(); const srect = strip.getBoundingClientRect();
-  if(rect.left < srect.left || rect.right > srect.right){ el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); }
-}
-
-function go(i){
-  current = (i+images.length)%images.length;
-  renderBinary(images[current]);
-  activate(current);
-  if(CONFIG.AUTOPLAY) restartAutoplay();
-}
-
-function next(){ go(current+1); }
-function prev(){ go(current-1); }
-
-btnNext.addEventListener('click', next);
-btnPrev.addEventListener('click', prev);
-btnRender.addEventListener('click', ()=>renderBinary(images[current]));
-
-// Binary render
-async function renderBinary(url){
-  if(!url){ placeholder(); return; }
-  const ratio = window.devicePixelRatio || 1;
-  const cell = Math.max(4, Math.floor(CONFIG.CELL * ratio));
-  const pad = Math.floor(CONFIG.PADDING * ratio);
-  const img = await preload(url);
-
-  const W = art.width, H = art.height;
-  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,W,H);
-
-  // Fit image into inner box
-  const availW = W - pad*2, availH = H - pad*2;
-  const imgR = img.width / img.height; const boxR = availW / availH;
-  let dw, dh; if(imgR>boxR){dw=availW; dh=Math.floor(availW/imgR);} else {dh=availH; dw=Math.floor(availH*imgR);} 
-  const dx = Math.floor((W-dw)/2), dy = Math.floor((H-dh)/2);
-
-  // sample pixels
-  const tmp = document.createElement('canvas'); tmp.width=dw; tmp.height=dh; const tctx = tmp.getContext('2d');
-  tctx.drawImage(img,0,0,dw,dh);
-  const data = tctx.getImageData(0,0,dw,dh).data;
-
-  ctx.textBaseline='middle'; ctx.textAlign='center'; ctx.font = cell+'px monospace';
-  for(let y=0;y<dh;y+=cell){
-    for(let x=0;x<dw;x+=cell){
-      const idx = ((y*dw)+x)*4; const r=data[idx], g=data[idx+1], b=data[idx+2];
-      const lum = (0.299*r + 0.587*g + 0.114*b)/255; // 0..1
-      const char = pickChar(lum, CONFIG.THRESHOLD, CONFIG.MODE);
-      ctx.fillStyle = lum > CONFIG.THRESHOLD ? '#6a5a80' : '#d8c6ff';
-      ctx.fillText(char, dx + x + cell/2, dy + y + cell/2);
-    }
-  }
-  // frame
-  ctx.strokeStyle = 'rgba(170,130,210,0.35)';
-  ctx.lineWidth = Math.max(1, ratio);
-  ctx.strokeRect(dx-1,dy-1,dw+2,dh+2);
-}
-
-function pickChar(lum, th, mode){
-  if(mode==='zeros') return '0';
-  if(mode==='ones') return '1';
-  if(mode==='random') return Math.random()>0.5?'1':'0';
-  return lum>th ? '1':'0';
-}
-
-function placeholder(){
-  const W=art.width,H=art.height; const ratio=window.devicePixelRatio||1; const size=Math.max(16,Math.floor(18*ratio));
-  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle = '#8a769f'; ctx.font = size+'px system-ui, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText('Đang tải ảnh… (hãy thêm vào thư mục anh/)', W/2, H/2);
-}
-
-// Download current canvas
-btnDownload.addEventListener('click', (e)=>{
-  e.preventDefault();
-  const url = art.toDataURL('image/png'); const a = document.createElement('a'); a.href=url; a.download='binary-love.png'; document.body.appendChild(a); a.click(); a.remove();
-});
-
-// Hearts FX — click/hold to spawn
-const hearts = [];
-function spawnHearts(x,y,count=16){
-  const ratio = window.devicePixelRatio||1;
-  for(let i=0;i<count;i++) hearts.push({x:x*ratio,y:y*ratio,vx:(Math.random()*2-1)*2*ratio,vy:(Math.random()*-2-0.5)*ratio,life:1,rot:Math.random()*Math.PI,size:(Math.random()*10+10)*ratio});
 }
 function heartPath(ctx,s){ctx.moveTo(0,-s*0.35);ctx.bezierCurveTo(s*0.5,-s*1.2, s*1.6,-s*0.1, 0, s*0.9);ctx.bezierCurveTo(-s*1.6,-s*0.1, -s*0.5,-s*1.2, 0,-s*0.35);} 
-function tick(){fxc.clearRect(0,0,fx.width,fx.height); const ratio=window.devicePixelRatio||1; for(let i=hearts.length-1;i>=0;i--){const h=hearts[i]; h.vy+=0.035*ratio; h.x+=h.vx; h.y+=h.vy; h.life-=0.012; if(h.life<=0){hearts.splice(i,1); continue;} fxc.save(); fxc.translate(h.x,h.y); fxc.rotate(h.rot); fxc.globalAlpha=Math.max(0,h.life); const g=fxc.createLinearGradient(-h.size,-h.size,h.size,h.size); g.addColorStop(0,'#ff8fbe'); g.addColorStop(1,'#7c5eff'); fxc.fillStyle=g; fxc.beginPath(); heartPath(fxc,h.size); fxc.closePath(); fxc.fill(); fxc.restore(); } requestAnimationFrame(tick);} 
-function pointerXY(ev){ if(ev.touches&&ev.touches[0]) return {x:ev.touches[0].clientX,y:ev.touches[0].clientY}; return {x:ev.clientX,y:ev.clientY}; }
-['click','pointerdown','touchstart'].forEach(evt=>window.addEventListener(evt,(e)=>{const {x,y}=pointerXY(e); spawnHearts(x,y,18);},{passive:true}));
-let holdTimer=null; ['pointerdown','touchstart'].forEach(evt=>window.addEventListener(evt,(e)=>{const {x,y}=pointerXY(e); holdTimer=setInterval(()=>spawnHearts(x,y,8),120);},{passive:true})); ['pointerup','touchend','pointercancel'].forEach(evt=>window.addEventListener(evt,()=>{clearInterval(holdTimer); holdTimer=null;}));
-
-function restartAutoplay(){ if(autoplayTimer) clearInterval(autoplayTimer); if(!CONFIG.AUTOPLAY) return; autoplayTimer=setInterval(next, CONFIG.AUTOPLAY_MS); }
-
-// Init
-fitCanvases(); placeholder();
-fetchManifest().then(list=>{images=list; buildStrip(images); if(!images.length){placeholder(); return;} current=0; go(0); restartAutoplay();}).catch(()=>placeholder());
+function tick(){
+  fxc.clearRect(0,0,fx.width,fx.height);
+  const r=window.devicePixelRatio||1;
+  for(let i=hearts.length-1;i>=0;i--){
+    const h=hearts[i];
+    h.vy += 0.035*r; h.x += h.vx; h.y += h.vy; h.life -= 0.012;
+    if(h.life<=0){hearts.splice(i,1); continue;}
+    fxc.save(); fxc.translate(h.x,h.y); fxc.rotate(h.rot); fxc.globalAlpha = Math.max(0,h.life);
+    const g=fxc.createLinearGradient(-h.size,-h.size,h.size,h.size);
+    g.addColorStop(0,'#ff8fbe'); g.addColorStop(1,'#7c5eff');
+    fxc.fillStyle=g; fxc.beginPath(); heartPath(fxc,h.size); fxc.closePath(); fxc.fill(); fxc.restore();
+  }
+  requestAnimationFrame(tick);
+}
 requestAnimationFrame(tick);
+
+// Click/hold hearts anywhere
+function pointerXY(ev){ if(ev.touches&&ev.touches[0]) return {x:ev.touches[0].clientX,y:ev.touches[0].clientY}; return {x:ev.clientX,y:ev.clientY}; }
+['click','pointerdown','touchstart'].forEach(evt=>window.addEventListener(evt,(e)=>{const {x,y}=pointerXY(e); spawnHearts(x,y,20,true);},{passive:true}));
+let holdTimer=null; ['pointerdown','touchstart'].forEach(evt=>window.addEventListener(evt,(e)=>{const {x,y}=pointerXY(e); holdTimer=setInterval(()=>spawnHearts(x,y,10,false),120);},{passive:true}));
+['pointerup','touchend','pointercancel'].forEach(evt=>window.addEventListener(evt,()=>{clearInterval(holdTimer); holdTimer=null;}));
+
+// Quiz logic
+qEl.textContent = CONFIG.QUESTION;
+btnHint.addEventListener('click', ()=>{ msgEl.textContent = CONFIG.HINT || 'Không có gợi ý 🤭'; msgEl.classList.remove('error');});
+
+btnCheck.addEventListener('click', check);
+ansEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') check(); });
+
+function normalize(s){
+  if(CONFIG.TRIM) s = s.trim();
+  if(CONFIG.CASE_INSENSITIVE) s = s.toLowerCase();
+  if(CONFIG.IGNORE_ACCENTS){
+    // remove combining marks with Unicode property escape (supported on modern browsers)
+    s = s.normalize('NFD').replace(/\p{M}+/gu,'');
+  }
+  // normalize separators
+  s = s.replace(/\s+/g,' ').replace(/[-_.]/g,'/');
+  return s;
+}
+
+function check(){
+  const val = normalize(ansEl.value);
+  if(!val){ msg('Hãy nhập câu trả lời nha 💌'); return; }
+  const ok = CONFIG.ANSWERS.map(normalize).includes(val);
+  if(ok){ unlock(); }
+  else { wrong(); }
+}
+
+function msg(t){ msgEl.textContent=t; msgEl.classList.remove('error'); }
+function wrong(){
+  msgEl.textContent = 'Ơ chưa đúng rồi, thử nhớ kỹ hơn nha 🥺';
+  msgEl.classList.add('error');
+  // shake effect
+  const box = document.getElementById('quizBox'); box.style.animation='shake 450ms';
+  setTimeout(()=>box.style.animation='',480);
+  // small hearts burst at input
+  const rect = ansEl.getBoundingClientRect();
+  spawnHearts(rect.left + rect.width - 10, rect.top + rect.height/2, 14, true);
+}
+
+function unlock(){
+  // Set wish text (typewriter)
+  typeText(wishText, CONFIG.WISH, 12);
+  document.getElementById('quizBox').style.display='none';
+  unlocked.classList.add('show');
+  // center burst
+  spawnHearts(innerWidth/2, innerHeight/2, 80, true);
+}
+
+function typeText(el, text, speed=12){
+  el.innerHTML='';
+  const lines = text.split(/\n/);
+  let i=0, j=0;
+  function step(){
+    if(i>=lines.length){ return; }
+    if(j===0){ if(i>0) el.appendChild(document.createElement('br')); }
+    const line = lines[i];
+    el.innerHTML += escapeHtml(line.charAt(j));
+    j++;
+    if(j>=line.length){ i++; j=0; setTimeout(step, 350); }
+    else { setTimeout(step, speed + Math.random()*30); }
+  }
+  step();
+}
+
+function escapeHtml(c){ const div=document.createElement('div'); div.textContent=c; return div.innerHTML; }
 </script>
 </body>
 </html>
